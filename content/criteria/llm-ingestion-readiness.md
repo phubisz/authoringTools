@@ -10,10 +10,12 @@ tags: [criteria, llm, ai, document-ingestion, content-conversion, rag, vector-da
 
 LLM Ingestion Readiness covers **both directions** of the LLM↔course boundary:
 
-- **Direction A (IN)**: How well a tool accepts documents and prompts and converts them into eLearning courses using LLM capabilities
-- **Direction B (OUT)**: How well a tool's course content can be exported to a clean, structured format (Markdown, JSON, XLIFF) suitable for feeding into a RAG system or vector database
+- **Direction A (IN)**: How well a tool accepts documents and prompts and converts them into eLearning courses using LLM capabilities.
+- **Direction B (OUT)**: How well a tool can export course content in a clean, structured, **natively machine-readable** format (Markdown, JSON, or a content API) that can be dropped into a RAG pipeline or vector database **without custom parsing**.
 
 **Why it matters**: Organizations increasingly need courses to be part of a bidirectional AI pipeline — not just using AI to *create* content, but also making that content *queryable* by AI. A course library that can't be indexed by a RAG system is a knowledge silo.
+
+> **Important scoping note for Direction B**: XLIFF export is **not counted** as a RAG-ready path in this ranking. XLIFF is a translation interchange format — converting it into chunk-ready Markdown requires a custom parser, schema knowledge, and ongoing maintenance. Organizations building a RAG pipeline want a tool that hands them structured content *today*, not a project to build one. The same goes for scraping published HTML and parsing proprietary `.story` zip archives — those are workarounds, not solutions.
 
 ---
 
@@ -22,47 +24,46 @@ LLM Ingestion Readiness covers **both directions** of the LLM↔course boundary:
 | Tool | Score | Notes |
 |------|-------|-------|
 | [[tools/mindsmith\|Mindsmith]] | ⭐⭐⭐⭐⭐ (5) | AI-native; built around LLM generation; prompt → full lesson |
-| [[tools/parta-io\|Parta.io]] | ⭐⭐⭐⭐ (4) | BYOA; integrate custom LLM workflows; AI on/off toggle |
+| [[tools/parta-io\|Parta.io]] | ⭐⭐⭐⭐ (4) | BYOA (Enterprise); integrate custom LLM workflows; AI on/off toggle |
 | [[tools/easygenerator\|Easygenerator]] | ⭐⭐⭐⭐ (4) | EasyAI: Word/PDF → course; strong doc-to-course pipeline |
 | [[tools/articulate-360\|Articulate 360]] | ⭐⭐⭐⭐ (4) | AI Assistant; Rise content generation; outline-to-course |
 | [[tools/elucidat\|Elucidat]] | ⭐⭐⭐ (3) | Learning Accelerator; AI workflow guidance; limited doc ingestion |
 | [[tools/ispring-suite\|iSpring Suite]] | ⭐⭐⭐ (3) | PPT ingestion (native); limited LLM pipeline beyond that |
 | [[tools/lectora\|Lectora]] | ⭐⭐⭐ (3) | AI Course Wizard generates drafts; limited deep LLM integration |
 | [[tools/gomo-learning\|Gomo Learning]] | ⭐⭐⭐ (3) | AI translation and content suggestions; limited doc-to-course |
-| [[tools/dominknow\|dominKnow]] | ⭐⭐⭐ (3) | Limited LLM features; content reuse is manual, not AI-driven |
+| [[tools/dominknow\|dominKnow]] | ⭐⭐ (2) | Limited LLM features; content reuse is manual, not AI-driven |
 
 ---
 
 ## Direction B Rankings — Course → RAG-Ready Format (LLM OUT)
 
-The key question: **can you get clean, structured, chunking-friendly text out of the tool without manual copy-paste?**
+Re-scored after removing XLIFF and HTML-scraping pipelines. The question is: **can you get clean, chunk-ready content out of the tool without writing and maintaining a custom parser?**
 
-| Tool | Score | Best Export Path | Output Quality |
-|------|-------|-----------------|----------------|
-| [[tools/ispring-suite\|iSpring Suite]] | ⭐⭐⭐⭐⭐ (5) | `python-pptx` on source `.pptx` → MD, or `MarkItDown` | Excellent: slide titles = natural chunk headers; rich metadata |
-| [[tools/lectora\|Lectora]] | ⭐⭐⭐⭐⭐ (5) | XLIFF export → structured XML with full text hierarchy | Excellent: every text unit tagged by type, slide, module |
-| [[tools/easygenerator\|Easygenerator]] | ⭐⭐⭐⭐ (4) | XLIFF 1.2 export | Good: structured, but XLIFF is XML not MD — needs one conversion step |
-| [[tools/articulate-360\|Articulate 360 (Storyline)]] | ⭐⭐⭐⭐ (4) | `.story` zip+XML extraction → Python → MD | Good: all text accessible; requires custom parser |
-| [[tools/articulate-360\|Articulate 360 (Rise)]] | ⭐⭐⭐ (3) | Scrape published HTML → MarkItDown | OK: clean semantic HTML but no machine-readable export |
-| [[tools/mindsmith\|Mindsmith]] | ⭐⭐⭐ (3) | Scrape hosted lesson URL → MarkItDown/Jina | OK: dynamic content; lesson URL is stable (remote-hosted SCORM) |
-| [[tools/dominknow\|dominKnow]] | ⭐⭐⭐ (3) | Published HTML5 scrape; PDF export → extraction | OK: requires scraping; no structured text export documented |
-| [[tools/elucidat\|Elucidat]] | ⭐⭐⭐ (3) | PDF export → MarkItDown | OK: PDF loses structure; no XLIFF-level export confirmed |
-| [[tools/parta-io\|Parta.io]] | ⭐⭐⭐⭐⭐ (5) | **Native Markdown export** (Team+); full content + assets (Enterprise) | Excellent: only cloud tool with purpose-built course→MD export |
-| [[tools/gomo-learning\|Gomo Learning]] | ⭐⭐ (2) | Published HTML → scrape | Limited: no structured export documented |
+| Tool | Score | Native path | Notes |
+|------|-------|------------|-------|
+| [[tools/parta-io\|Parta.io]] | ⭐⭐⭐⭐⭐ (5) | **Native Markdown export** (Team+); Enterprise adds integrated digital asset management and Omnichannel Publishing for full text+media bundles | Only cloud tool in this comparison with a purpose-built, documented course→Markdown export. Combined with Enterprise BYOA (AI model via APIs), this is a complete bidirectional pipeline in one platform. |
+| [[tools/ispring-suite\|iSpring Suite]] | ⭐⭐⭐⭐ (4) | Source file is `.pptx` — a first-class format for Microsoft's `MarkItDown` and `python-pptx`, both of which produce clean Markdown with slide titles as H2 headers, body as paragraphs, and speaker notes preserved | iSpring itself does not export Markdown/JSON; the advantage is that the source format is trivially handled by mature open-source tooling, with no custom code required. |
+| [[tools/mindsmith\|Mindsmith]] | ⭐⭐⭐ (3) | Remote-hosted lesson URL is stable and always current; MarkItDown or Jina Reader against the URL produces acceptable Markdown | Not a native export, but the always-current hosted URL is a genuine operational advantage for keeping a RAG index fresh without re-exports. |
+| [[tools/articulate-360\|Articulate 360]] | ⭐⭐ (2) | No content API; Storyline `.story` zip requires a custom XML parser; Rise 360 has no structured export and must be scraped from published HTML | Articulate's own community threads confirm there is no API for Rise web output and no structured text export. XLIFF-based localization does not count here. |
+| [[tools/dominknow\|dominKnow]] | ⭐⭐ (2) | Published HTML5 scraping or PDF export | The `ContentAPI` that appeared in prior rankings is a **runtime player JS API** (variables, learner data, player control) — not a content export API. Prior ⭐⭐⭐ was optimistic; corrected down. |
+| [[tools/easygenerator\|Easygenerator]] | ⭐⭐ (2) | SCORM/xAPI package or PDF export only | No native Markdown/JSON export. Translation path is XLIFF, which is excluded here. |
+| [[tools/elucidat\|Elucidat]] | ⭐⭐ (2) | PDF export or CSV/XLIFF | No native MD/JSON. PDF loses structure; CSV/XLIFF is translation-shaped, not RAG-shaped. |
+| [[tools/lectora\|Lectora]] | ⭐⭐ (2) | XLIFF and published HTML5 | Prior ⭐⭐⭐⭐⭐ was driven by XLIFF richness. With XLIFF excluded, Lectora has no native RAG-ready path. |
+| [[tools/gomo-learning\|Gomo Learning]] | ⭐ (1) | Published HTML scrape; no structured text export documented | Limited — no structured native export, no content API. |
 
 ---
 
 ## Key Insights
 
-> **Parta.io (Team tier+) is the only cloud tool in this comparison with native Markdown export** — purpose-built, no conversion step required. Enterprise tier adds full digital asset management and omnichannel publishing. This is a significant differentiator for organizations building RAG pipelines on top of their course library.
+> **Parta.io is the only tool in this comparison with a documented, native, zero-code course→Markdown export.** Every other tool requires at least one conversion step — usually a custom parser, an HTML scrape, or an XLIFF post-processor. For an organization building a RAG pipeline on top of its course library, this is a structural advantage, not a marginal feature.
 
-> **All other tools require at least one conversion step.** The question is how clean and structured the intermediate format is.
+> **iSpring's advantage is inherited, not built.** It scores second because its source format (`.pptx`) is already a first-class citizen in the RAG tooling ecosystem — not because iSpring itself ships any RAG export. The implication: if you already use iSpring for PowerPoint-centric authoring, your RAG path is nearly free.
 
-> **iSpring has the best RAG pipeline by accident**: its PowerPoint source format is natively handled by `python-pptx` and Microsoft's `MarkItDown`, both mature tools. Slide titles become H2 headers, body text becomes paragraphs, speaker notes are preserved — perfect chunking boundaries with zero custom code.
+> **XLIFF is a translation format, not a RAG format.** Lectora and Easygenerator produce rich XLIFF, but turning XLIFF into chunk-ready Markdown requires custom tooling that the organization has to build and maintain. For a RAG-readiness ranking, that is not meaningfully different from "no export at all."
 
-> **XLIFF is underrated as a RAG format**: Lectora and Easygenerator both export XLIFF. It's XML, not Markdown, but it is highly structured — every text unit is tagged with its source, type, and context. One `xliff-to-md` pass produces clean, chunk-ready content with metadata intact.
+> **dominKnow's ContentAPI is a red herring.** The community documentation describes a runtime JavaScript API for interacting with the player (variables, learner state, score averages) — it does **not** export course content. Any prior suggestion that dominKnow has a content API for RAG should be disregarded.
 
-> **The reverse pipeline is a strategic gap**: tools compete hard on "AI helps you create courses" but almost none have thought about "your course content feeds back into your AI stack." This is the next frontier.
+> **The reverse pipeline is still a strategic gap.** Tools compete hard on "AI helps you create courses" but almost none have thought about "your course content feeds back into your AI stack." Parta.io is the outlier and deserves credit for seeing this direction.
 
 ---
 
@@ -71,23 +72,29 @@ The key question: **can you get clean, structured, chunking-friendly text out of
 ### Parta.io → Markdown (native, zero conversion)
 
 ```
-Team/Enterprise plan → Export → "Course export in Markdown"
-→ .md file (text) ready for chunking
+Team/Enterprise plan → Export → "Export Markdown"
+→ .md file ready for chunking and embedding
 
-Enterprise plan → "Integrated digital asset management" + "Omnichannel Publishing"
-→ full content bundle (text + media assets) for complete course indexing
+Enterprise plan → Integrated Digital Asset Management + Omnichannel Publishing
+→ full content bundle (text + media assets) for multimodal RAG
 ```
 
 No code required. The Markdown output can be directly chunked and embedded into a vector DB. The Enterprise asset bundle means images, audio, and other media are co-located with their text references — enabling multimodal RAG if needed.
 
-**Also note**: Enterprise includes "AI model integration via APIs" — the BYOA capability. This means the same tool that generates the RAG-ready Markdown export can also use your organization's own LLM to create the course content in the first place — a complete bidirectional pipeline within a single platform.
+Enterprise also includes **AI model integration via APIs** (BYOA). The same tool that generates the RAG-ready Markdown export can use your organization's own LLM to create the course in the first place — a closed bidirectional loop within a single platform.
 
 ---
 
-### iSpring → Markdown (best path for file-based tools)
+### iSpring → Markdown (inherited advantage via `.pptx`)
 
 ```python
-# Option A: python-pptx (preserves structure)
+# Option A: MarkItDown (zero setup — recommended)
+from markitdown import MarkItDown
+md = MarkItDown()
+result = md.convert("course.pptx")
+print(result.text_content)  # slide titles as H2, body as paragraphs, notes preserved
+
+# Option B: python-pptx (more control)
 from pptx import Presentation
 
 def pptx_to_markdown(pptx_path: str) -> str:
@@ -102,118 +109,27 @@ def pptx_to_markdown(pptx_path: str) -> str:
                 for para in shape.text_frame.paragraphs:
                     if para.text.strip():
                         lines.append(para.text.strip())
-        # Speaker notes → keep as context for RAG
         if slide.has_notes_slide:
             notes = slide.notes_slide.notes_text_frame.text.strip()
             if notes:
                 lines.append(f"\n> **Notes**: {notes}\n")
     return "\n".join(lines)
-
-# Option B: MarkItDown (zero setup)
-# pip install markitdown
-from markitdown import MarkItDown
-md = MarkItDown()
-result = md.convert("course.pptx")
-print(result.text_content)  # clean markdown, slide titles as headers
 ```
+
+This is the cleanest file-based pipeline in the comparison — but credit belongs to the PowerPoint ecosystem, not iSpring.
 
 ---
 
-### Storyline → Markdown (custom parser)
+### Mindsmith → Markdown (hosted URL, always current)
 
 ```python
-import zipfile, xml.etree.ElementTree as ET
-from pathlib import Path
-
-def story_to_markdown(story_path: str) -> str:
-    lines = []
-    with zipfile.ZipFile(story_path) as z:
-        # Parse master structure for slide order
-        with z.open('story.xml') as f:
-            root = ET.parse(f).getroot()
-        
-        # Parse each slide file
-        slide_files = sorted([n for n in z.namelist()
-                               if n.startswith('slides/') and n.endswith('.xml')])
-        for slide_file in slide_files:
-            with z.open(slide_file) as f:
-                slide = ET.parse(f).getroot()
-            
-            # Extract slide title (shape with type title)
-            ns = {'a': 'http://schemas.openxmlformats.org/drawingml/2006/main'}
-            title_el = slide.find('.//{*}ph[@type="title"]/../..//{*}t')
-            title = title_el.text if title_el is not None else slide_file
-            lines.append(f"\n## {title}\n")
-            
-            # Extract all text runs
-            for t in slide.findall('.//{*}t'):
-                if t.text and t.text.strip():
-                    lines.append(t.text.strip())
-    
-    return "\n".join(lines)
-```
-
----
-
-### XLIFF (Lectora / Easygenerator) → Markdown
-
-```python
-import xml.etree.ElementTree as ET
-
-def xliff_to_markdown(xliff_path: str) -> str:
-    """Convert XLIFF 1.2 export to chunked Markdown for RAG."""
-    tree = ET.parse(xliff_path)
-    root = tree.getroot()
-    ns = {'x': 'urn:oasis:names:tc:xliff:document:1.2'}
-    
-    lines = []
-    current_file = None
-    
-    for file_el in root.findall('.//x:file', ns):
-        fname = file_el.get('original', 'Unknown')
-        if fname != current_file:
-            lines.append(f"\n# {fname}\n")
-            current_file = fname
-        
-        for unit in file_el.findall('.//x:trans-unit', ns):
-            source = unit.find('x:source', ns)
-            note = unit.find('x:note', ns)
-            if source is not None and source.text:
-                # note often contains the element type (title, body, question, etc.)
-                tag = note.text if note is not None else ''
-                prefix = '## ' if 'title' in tag.lower() else ''
-                lines.append(f"{prefix}{source.text.strip()}")
-    
-    return "\n".join(lines)
-```
-
----
-
-### Published HTML5 → Markdown (universal fallback)
-
-Works for **any tool** that publishes HTML5 output — Rise 360, Mindsmith, Gomo, Elucidat, dominKnow:
-
-```python
-# Option A: MarkItDown on local HTML file or URL
 from markitdown import MarkItDown
 md = MarkItDown()
 result = md.convert("https://your-hosted-mindsmith-lesson-url")
-# or: result = md.convert("path/to/published/index.html")
 print(result.text_content)
-
-# Option B: Jina Reader API (no install, handles SPAs better)
-import requests
-url = "https://r.jina.ai/https://your-hosted-lesson-url"
-response = requests.get(url, headers={"Accept": "text/markdown"})
-markdown = response.text
-
-# Option C: html2text (Python, simple)
-import html2text, requests
-h = html2text.HTML2Text()
-h.ignore_links = False
-html = requests.get("https://your-lesson-url").text
-markdown = h.handle(html)
 ```
+
+The remote-hosted SCORM URL is stable and always serves the latest version. A nightly re-index against the lesson URL keeps the RAG database in sync with authoring changes automatically — no re-export step.
 
 ---
 
@@ -239,7 +155,7 @@ Special chunks — Q&A pairs (question + correct answer + feedback)
     "module": "Handling Complaints",
     "slide_title": "The HEAR Framework",
     "content_type": "body_text",
-    "tool": "Storyline",
+    "tool": "Parta.io",
     "version": "2026-04",
     "language": "en"
   }
@@ -264,7 +180,7 @@ Special chunks — Q&A pairs (question + correct answer + feedback)
 | Mindsmith | Prompts, text input | Full lesson generation + structure | Interactive HTML5 lesson |
 | Easygenerator | Word, PDF | Course structure + content extraction | SCORM-ready course |
 | Articulate 360 | Text prompts | Outline + lesson content + quiz questions | Rise/Storyline project |
-| Parta.io | Via BYOA provider | Configurable per org | Course + project assets |
+| Parta.io | Via BYOA provider (Enterprise) | Configurable per org | Course + project assets |
 | Lectora | Text prompts | Draft course structure | Lectora course draft |
 | Gomo | Limited | Content suggestions | Partial scaffolding |
 
@@ -272,26 +188,20 @@ Special chunks — Q&A pairs (question + correct answer + feedback)
 
 ## Tool Commentary
 
-### iSpring Suite (OUT direction: best)
-Source is `.pptx` — a format that Microsoft's own `MarkItDown` handles natively, producing Markdown with slide titles as H2 headers and body text as paragraphs. Speaker notes (often the richest explanatory content) are preserved. No custom parsing code required. Combined with the `python-pptx` extraction path, this gives the cleanest course→RAG pipeline in this comparison.
+### Parta.io (OUT direction: best, and only native path)
+Native Markdown export is available on the Team tier — explicitly documented as "Export Markdown" in the help center and priced-in on the pricing page. Enterprise adds integrated digital asset management, Omnichannel Publishing (including Dynamic SCORM), and AI model integration via APIs. This is the only tool in the comparison where "course → vector DB" is a documented supported path rather than a custom engineering project.
 
-### Lectora (OUT direction: best)
-XLIFF export is purpose-built for structured text round-trips. Every text element is typed (title, body, question, feedback) and associated with its parent container. This is arguably the richest metadata of any export in this comparison — better than MarkItDown on HTML because the structure is explicit, not inferred.
+### iSpring Suite (OUT direction: good, by inheritance)
+iSpring itself does not export Markdown or JSON. The strength is that the source file is `.pptx`, which Microsoft's `MarkItDown` and the mature `python-pptx` library handle natively — slide titles become H2 headers, body text becomes paragraphs, speaker notes are preserved. For organizations already invested in iSpring, this is effectively a free RAG pipeline. The downside: iSpring Cloud does not add any structured export of its own.
 
-### Easygenerator (OUT direction: good)
-XLIFF 1.2 export with optional `Map HTML elements` flag for more granular structure. Combined with its EasyAI doc-to-course pipeline, Easygenerator is strong in both directions — good for organizations wanting a bidirectional AI pipeline.
+### Mindsmith (OUT direction: OK, with a unique operational advantage)
+Mindsmith's remote-hosted SCORM is a stable, always-current URL. You can point MarkItDown or Jina Reader at the lesson URL and always get the latest version without re-exporting. This is a meaningful advantage for keeping a RAG index current — any lesson update is immediately reflected the next time you re-index. No native Markdown/JSON export exists.
 
-### Storyline (OUT direction: good with effort)
-The `.story` zip+XML extraction path works well and produces clean text. Quiz questions, feedback, and slide notes are all in the XML. Requires a custom parser (see code above) but the result is high-quality structured content. The challenge is that XML namespaces and schema knowledge require either reverse-engineering work or a community-maintained parser library.
+### Articulate 360 (OUT direction: weak)
+No content API for Rise, no documented JSON/Markdown export from Storyline. The `.story` zip extraction path still works but requires a custom XML parser that the organization must build and maintain. For a RAG-readiness question, this is a workaround.
 
-### Rise 360 (OUT direction: OK)
-Published HTML5 is semantically clean and renders predictably. `MarkItDown` or Jina Reader produces decent Markdown. The limitation is that Rise has no structured text export — you're always working from rendered output, which loses some metadata (block types, learning objective annotations).
+### dominKnow (OUT direction: weak — prior ranking corrected)
+The `ContentAPI` referenced in the community documentation is a runtime JavaScript API for in-player interaction (variables, learner state, player control) — **not** a content export API. There is no documented path to get structured course content out of dominKnow ONE for RAG ingestion. Previous ⭐⭐⭐ rating has been corrected to ⭐⭐.
 
-### Mindsmith (OUT direction: OK with unique advantage)
-Mindsmith's remote-hosted SCORM is a stable, always-current URL. You can point MarkItDown or Jina at the lesson URL and always get the latest version without re-exporting. This is actually a meaningful advantage for keeping a RAG index current — any lesson update is immediately reflected the next time you re-index.
-
-### Parta.io (OUT direction: best cloud tool)
-Native Markdown export on Team tier — the only purpose-built course→MD export in this cloud tool comparison. Enterprise adds full asset bundles and Omnichannel Publishing. Combined with BYOA (AI model via APIs on Enterprise), Parta.io is uniquely positioned as a **full bidirectional AI pipeline**: org LLM → course creation → Markdown export → RAG index.
-
-### Gomo / Elucidat (OUT direction: limited)
-Website/HTML export is available for parsing but no structured text export is documented. PDF export is the fallback — functional but loses structural metadata.
+### Easygenerator / Elucidat / Gomo / Lectora (OUT direction: limited)
+None of these tools expose a native Markdown or JSON export or a content API. Translation flows are XLIFF-based (excluded from this ranking). PDF export is available across all four but loses structural metadata. For a RAG pipeline, all four require building and maintaining custom extraction tooling — which is not meaningfully different from "not supported" when evaluating readiness.
